@@ -1,0 +1,48 @@
+stage: week5_locked_test_validation
+
+evaluation_status:
+  completed_on: 2026-10-19
+  test_status: historical_consumed
+  permitted_future_use: exact_v1_reproduction_and_retrospective_analysis_only
+  prohibited_future_use: v2_model_or_threshold_selection
+
+data:
+  train: data/processed/train.csv
+  validation: data/processed/valid.csv
+  test: data/processed/test.csv
+  test_policy: single_final_evaluation_after_week1_to_week4_selection
+
+experiments:
+  A: Morgan RF
+  B: Frozen ChemBERTa MLP
+  C: Fixed-weight fusion
+  D: Dynamic similarity fusion
+
+repetition:
+  seeds: [11, 22, 33, 44, 55]
+  train_split: frozen_scaffold_train
+  model_selection_split: frozen_scaffold_validation
+  final_evaluation_split: frozen_scaffold_test
+  fusion_parameters: refit_on_validation_for_each_seed
+  test_usage: metrics_only
+
+metrics:
+  - ROC-AUC
+  - PR-AUC
+  - F1
+  - Brier score
+  - balanced accuracy
+  - MCC
+  - inference time
+
+similarity_analysis:
+  bins: validation_defined_tanimoto_quartiles
+  bin_count: 4
+  scaffold_error_metric: dynamic_brier_advantage_vs_fixed
+
+inference_timing:
+  device: automatic
+  model_loading: excluded
+  feature_generation: included
+  execution: sequential
+  unit: milliseconds_per_molecule

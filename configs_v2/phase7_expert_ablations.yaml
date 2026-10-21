@@ -1,0 +1,85 @@
+stage: phase7_expert_ablations
+status: post_phase5_exploratory_not_independent_confirmation
+
+inputs:
+  standardized_csv: data/processed_v2/bace_standardized.csv
+  split_directory: data/splits_v2
+  frozen_mean_cache: data/processed_v2/features/chemberta_standardized_embeddings.npz
+  calibrated_rf_csv: results_v2/calibrated_base_model_predictions.csv
+  phase3_hyperparameters_csv: results_v2/base_model_hyperparameters.csv
+  phase6_fold_metrics_csv: results_v2/phase6_fold_metrics.csv
+
+encoder:
+  checkpoint: DeepChem/ChemBERTa-77M-MLM
+  local_cache: models/huggingface
+  max_length: 256
+  batch_size: 32
+  torch_threads: 4
+  local_files_only: true
+
+experiment:
+  repeats: [1, 2]
+  outer_folds: [1, 2, 3, 4, 5]
+  inner_folds: [1, 2, 3]
+  training_seeds: [11, 22, 33]
+  selection_seed: 11
+  primary_metric: average_precision
+  low_similarity_development_quantile: 0.25
+  pooling_variants: [mean_mlp, cls_mlp, attention_mlp]
+  head_variants: [mean_mlp, mean_logistic]
+  augmentation_variants: [mean_mlp, mean_mlp_aug2]
+  finetuning_variants: [mean_mlp_ft_last0, mean_mlp_ft_last1, mean_mlp_ft_last2]
+  conditional_third_expert: dmpnn
+  entry_rule:
+    minimum_low_similarity_win_folds_vs_rf: 7
+    maximum_brier_increase_vs_rf: 0.003
+    minimum_overall_ap_improvement_vs_mean_mlp: 0.0
+
+frozen_head:
+  mlp_grid:
+    hidden_dim: [64]
+    dropout: [0.1, 0.3]
+    learning_rate: [0.0003, 0.0001]
+    weight_decay: [0.0001]
+  logistic_grid:
+    C: [0.1, 1.0, 10.0]
+  max_epochs: 80
+  patience: 12
+  augmentation_n: 2
+  augmentation_seed: 20261020
+
+finetuning:
+  learning_rate: 0.00002
+  head_learning_rate: 0.0003
+  weight_decay: 0.0001
+  batch_size: 128
+  max_epochs: 4
+  patience: 1
+  hidden_dim: 64
+  dropout: 0.1
+
+dmpnn:
+  hidden_dim: 64
+  message_steps: 3
+  dropout: 0.1
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  batch_size: 64
+  max_epochs: 40
+  patience: 8
+
+calibration:
+  method: platt
+  probability_clip: 0.000001
+  C: 1000000.0
+  max_iter: 1000
+
+outputs:
+  token_cache: data/processed_v2/features/chemberta_phase7_token_hidden.npz
+  augmented_cache: data/processed_v2/features/chemberta_phase7_augmented_mean.npz
+  feature_metadata_json: results_v2/phase7_feature_metadata.json
+  predictions_csv_gz: results_v2/phase7_expert_predictions.csv.gz
+  ablations_csv: results_v2/phase7_expert_ablations.csv
+  hyperparameter_csv: results_v2/phase7_hyperparameters.csv
+  fit_audit_csv: results_v2/phase7_fit_audit.csv
+  run_metadata_json: results_v2/phase7_run_metadata.json

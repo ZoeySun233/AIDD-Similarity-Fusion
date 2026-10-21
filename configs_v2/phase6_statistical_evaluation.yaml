@@ -1,0 +1,73 @@
+stage: phase6_post_phase5_evaluation
+status: original_outer_results_plus_post_phase5_sensitivity
+
+inputs:
+  standardized_csv: data/processed_v2/bace_standardized.csv
+  split_directory: data/splits_v2
+  phase5_predictions_csv: results_v2/fusion_predictions_v2.csv
+  calibrated_base_predictions_csv: results_v2/calibrated_base_model_predictions.csv
+  phase5_gate_parameters_csv: results_v2/fusion_feature_audit_v2.csv
+  phase5_config_yaml: configs_v2/phase5_fusion.yaml
+  phase1_activity_cliffs_csv: results_v2/activity_cliffs.csv
+  embedding_cache: data/processed_v2/features/chemberta_standardized_embeddings.npz
+
+independent_inner_sensitivity:
+  training_seeds: [11, 22, 33]
+  rf:
+    radius: 2
+    fingerprint_size: 2048
+    include_chirality: true
+    n_estimators: 200
+    class_weight: balanced_subsample
+    max_depth: 24
+    min_samples_leaf: 3
+    max_features: sqrt
+    n_jobs: 4
+  chemberta_head:
+    hidden_dim: 64
+    dropout: 0.1
+    learning_rate: 0.0003
+    weight_decay: 0.0001
+    epochs: 40
+    torch_threads: 4
+  calibration:
+    probability_clip: 0.000001
+    C: 1000000.0
+    solver: lbfgs
+    max_iter: 1000
+  similarity:
+    top_k: 5
+  gate:
+    beta_l2: 0.01
+    lambda_l2: 0.02
+    optimizer_maxiter: 500
+
+evaluation:
+  primary_comparison: [D2_similarity_entropy, C1_fixed_weight]
+  supporting_comparison: [D1_shrunk_similarity, C1_fixed_weight]
+  threshold_selection: maximize_inner_f1
+  top_fractions: [0.05, 0.10]
+  fixed_screening_fraction: 0.05
+  low_similarity_quantile: 0.25
+  bootstrap_replicates: 2000
+  bootstrap_seed: 20261019
+  permutation_replicates: 30
+  permutation_seed: 20261020
+  permutation_methods: [D1_shrunk_similarity, D2_similarity_entropy]
+  maximum_scaffold_influence_checks: 10
+
+outputs:
+  independent_inner_predictions_csv_gz: results_v2/phase6_independent_inner_predictions.csv.gz
+  independent_inner_fit_audit_csv: results_v2/phase6_independent_inner_fit_audit.csv
+  independent_gate_selection_csv: results_v2/phase6_independent_gate_selection.csv
+  independent_inner_metadata_json: results_v2/phase6_independent_inner_metadata.json
+  fold_metrics_csv: results_v2/phase6_fold_metrics.csv
+  paired_differences_csv: results_v2/phase6_paired_differences.csv
+  scaffold_bootstrap_csv: results_v2/phase6_scaffold_bootstrap.csv
+  threshold_audit_csv: results_v2/phase6_threshold_audit.csv
+  similarity_strata_csv: results_v2/phase6_similarity_strata.csv
+  gate_diagnostics_csv: results_v2/phase6_gate_diagnostics.csv
+  scaffold_influence_csv: results_v2/phase6_scaffold_influence.csv
+  similarity_permutations_csv: results_v2/phase6_similarity_permutations.csv
+  evaluation_metadata_json: results_v2/phase6_evaluation_metadata.json
+  resolved_config_json: results_v2/phase6_resolved_config.json

@@ -1,0 +1,35 @@
+stage: week3_frozen_chemberta_baseline
+
+data:
+  train: data/processed/train.csv
+  validation: data/processed/valid.csv
+  test_policy: locked_and_not_read
+
+encoder:
+  checkpoint: DeepChem/ChemBERTa-77M-MLM
+  frozen: true
+  pooling: attention_masked_mean
+  max_length: 256
+  batch_size: 32
+  cache_directory: models/huggingface
+
+classifier:
+  type: single_hidden_layer_mlp
+  selection_seed: 42
+  robustness_seeds: [11, 22, 33, 44, 55]
+  batch_size: 64
+  max_epochs: 200
+  patience: 25
+  search:
+    hidden_dim: [64, 128]
+    dropout: [0.1, 0.3]
+    learning_rate: [0.0001, 0.0003]
+    weight_decay: [0.0001]
+
+selection:
+  primary: validation_pr_auc
+  tie_breakers: [validation_roc_auc, validation_brier_score]
+
+reporting:
+  metrics: [roc_auc, pr_auc, brier_score, f1, balanced_accuracy, mcc]
+  threshold: maximize_validation_f1

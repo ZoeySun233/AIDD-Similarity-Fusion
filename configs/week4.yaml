@@ -1,0 +1,40 @@
+stage: week4_similarity_aware_fusion
+
+data:
+  train: data/processed/train.csv
+  validation: data/processed/valid.csv
+  rf_predictions: results/rf_validation_predictions.csv
+  chemberta_predictions: results/chemberta_validation_predictions.csv
+  test_policy: locked_and_not_read
+
+similarity:
+  fingerprint: Morgan
+  radius: 2
+  n_bits: 2048
+  include_chirality: true
+  aggregation: maximum_over_training_set
+  metric: Tanimoto
+
+fixed_fusion:
+  alpha_rf_range: [0.0, 1.0]
+  alpha_rf_step: 0.001
+
+dynamic_fusion:
+  function: alpha_rf(x) = sigmoid(a * max_tanimoto(x, train) + b)
+  coarse_search:
+    a_range: [-32.0, 32.0]
+    a_step: 0.5
+    b_range: [-12.0, 12.0]
+    b_step: 0.5
+  fine_search:
+    radius_around_coarse_optimum: 1.0
+    step: 0.05
+
+selection:
+  primary: validation_pr_auc
+  tie_breakers: [validation_roc_auc, validation_brier_score]
+
+reporting:
+  metrics: [roc_auc, pr_auc, brier_score, f1, balanced_accuracy, mcc]
+  threshold: maximize_validation_f1
+  hypothesis_diagnostic: spearman_similarity_vs_per_molecule_rf_brier_advantage

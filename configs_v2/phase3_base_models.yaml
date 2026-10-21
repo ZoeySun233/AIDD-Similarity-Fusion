@@ -1,0 +1,45 @@
+stage: phase3_nested_base_models
+
+data:
+  standardized_csv: data/processed_v2/bace_standardized.csv
+  split_directory: data/splits_v2
+  smiles_column: standardized_smiles
+  label_column: Class
+  id_column: CID
+  source_row_column: source_row
+
+training_seeds: [11, 22, 33]
+selection:
+  seed: 11
+  primary_metric: pr_auc
+  tie_breakers: [roc_auc, brier_score]
+
+morgan_rf:
+  radius: 2
+  fingerprint_size: 2048
+  include_chirality: true
+  n_estimators: 200
+  class_weight: balanced_subsample
+  search:
+    max_depth: [null, 24]
+    min_samples_leaf: [1, 3]
+    max_features: [sqrt]
+
+frozen_chemberta_mlp:
+  checkpoint: DeepChem/ChemBERTa-77M-MLM
+  max_length: 256
+  embedding_batch_size: 32
+  max_epochs: 80
+  patience: 12
+  search:
+    hidden_dim: [64]
+    dropout: [0.1, 0.3]
+    learning_rate: [0.0003, 0.0001]
+    weight_decay: [0.0001]
+
+outputs:
+  prediction_csv: results_v2/base_model_predictions.csv
+  hyperparameter_csv: results_v2/base_model_hyperparameters.csv
+  run_metadata_json: results_v2/phase3_run_metadata.json
+  embedding_cache: data/processed_v2/features/chemberta_standardized_embeddings.npz
+  embedding_metadata_json: results_v2/phase3_embedding_metadata.json

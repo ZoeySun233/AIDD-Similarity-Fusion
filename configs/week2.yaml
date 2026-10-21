@@ -1,0 +1,33 @@
+stage: week2_random_forest_baseline
+
+data:
+  train: data/processed/train.csv
+  validation: data/processed/valid.csv
+  test_policy: locked_and_not_read
+
+fingerprint:
+  type: Morgan
+  radius: 2
+  n_bits: 2048
+  include_chirality: true
+  use_bond_types: true
+
+model:
+  type: RandomForestClassifier
+  n_estimators: 500
+  criterion: gini
+  class_weight: balanced_subsample
+  selection_seed: 42
+  robustness_seeds: [11, 22, 33, 44, 55]
+  search:
+    max_depth: [null, 12, 24]
+    min_samples_leaf: [1, 3, 5]
+    max_features: [sqrt, 0.25]
+
+selection:
+  primary: validation_pr_auc
+  tie_breakers: [validation_roc_auc, validation_brier_score]
+
+reporting:
+  metrics: [roc_auc, pr_auc, brier_score, f1, balanced_accuracy, mcc]
+  threshold: maximize_validation_f1

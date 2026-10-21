@@ -1,0 +1,20 @@
+stage: wp4_exploratory_screening
+input_predictions: results_v2/external_wp3/paired_predictions.csv
+frozen_manifest: models_v2/external_frozen_bundle/manifest.json
+primary_assay: CHEMBL5736880
+secondary_assay: CHEMBL5734173
+coverage_fractions: [1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
+screening_fraction_of_original_cohort: 0.05
+decision_threshold_for_descriptive_error: 0.5
+ranking_tie_break: ascending_assay_then_inchikey
+deferral_rules:
+  - c1_boundary_distance
+  - expert_agreement
+  - training_similarity
+benchmark:
+  input_csv: data/processed_v2/bace_standardized.csv
+  n_original_molecules: 128
+  selection: first_128_by_source_row
+  repetitions: 1
+  excludes_external_labels: true
+output_directory: results_v2/wp4_screening

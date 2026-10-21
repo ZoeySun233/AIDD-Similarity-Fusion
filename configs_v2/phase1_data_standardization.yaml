@@ -1,0 +1,35 @@
+dataset:
+  raw_csv: data/raw/bace.csv
+  legacy_split_csv: data/processed/bace_scaffold_split.csv
+  smiles_column: mol
+  identifier_column: CID
+  classification_target: Class
+  regression_target: pIC50
+
+standardization:
+  keep_all_source_rows: true
+  largest_fragment:
+    enabled: true
+    prefer_organic: true
+  normalize_functional_groups: true
+  reionize: true
+  uncharge: true
+  canonicalize_tautomer: true
+  canonical_smiles_isomeric: true
+  scaffold_include_chirality: false
+
+audit:
+  pic50_activity_threshold: 7.0
+  activity_cliff:
+    morgan_radius: 2
+    fingerprint_size: 2048
+    minimum_tanimoto: 0.70
+    potency_difference_log10_threshold: 1.0
+  fail_on_cross_legacy_split_duplicate: false
+
+outputs:
+  standardized_csv: data/processed_v2/bace_standardized.csv
+  data_audit_csv: results_v2/data_audit.csv
+  label_consistency_audit_csv: results_v2/label_consistency_audit.csv
+  activity_cliffs_csv: results_v2/activity_cliffs.csv
+  run_metadata_json: results_v2/phase1_run_metadata.json

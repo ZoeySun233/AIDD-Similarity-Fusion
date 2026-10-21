@@ -1,0 +1,33 @@
+source:
+  api_base: https://www.ebi.ac.uk/chembl/api/data
+  target_chembl_id: CHEMBL4822
+  organism: Homo sapiens
+  snapshot_dir: data/external_v2/chembl_37_wp2
+  assays:
+    - assay_id: CHEMBL5736880
+      role: primary_candidate
+      patent_id: US-11021493-B2
+      patent_priority_date: 2016-12-15
+      patent_url: https://patents.google.com/patent/US11021493B2/en
+    - assay_id: CHEMBL5734173
+      role: temporal_sensitivity_candidate
+      patent_id: US-10336717-B2
+      patent_priority_date: 2009-03-13
+      patent_url: https://patents.google.com/patent/US10336717B2/en
+eligibility:
+  assay_type: B
+  standard_type: IC50
+  standard_units: nM
+  standard_relation: "="
+  maximum_ic50_nm_for_active: 100.0
+  minimum_structures_per_class_per_assay: 30
+  acceptable_data_validity_comments:
+    - null
+    - Manually validated
+  require_potential_duplicate_zero: true
+  exclude_external_structure_overlap: true
+  exclude_cross_threshold_replicates: true
+outputs:
+  curation_manifest: results_v2/external_wp2_curation_manifest.csv
+  cohort: data/external_v2/chembl_37_wp2/eligible_cohort.csv
+  audit_summary: results_v2/external_wp2_audit_summary.json

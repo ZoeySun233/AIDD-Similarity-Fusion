@@ -1,0 +1,30 @@
+# Locally acquired third-party data and generated outputs
+data/raw/
+data/processed/
+data/processed_v2/
+data/splits_v2/
+data/external_v2/
+models/
+models_v2/
+results/
+results_v2/
+v1_original_experiment/
+
+# Python, environments, caches, notebooks, and OS/editor files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+.env.*
+.DS_Store
+.idea/
+.vscode/
+*.ipynb
+
+# Generated packaging output
+build/
+dist/
+*.egg-info/

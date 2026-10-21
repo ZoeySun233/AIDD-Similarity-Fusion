@@ -1,0 +1,25 @@
+stage: phase5_v2_fusion_ablations
+
+inputs:
+  standardized_csv: data/processed_v2/bace_standardized.csv
+  calibrated_predictions_csv: results_v2/calibrated_base_model_predictions.csv
+  split_directory: data/splits_v2
+
+similarity:
+  morgan_radius: 2
+  fingerprint_size: 2048
+  top_k: 5
+
+optimization:
+  objective: brier_score
+  beta_l2: 0.01
+  lambda_l2: 0.02
+  optimizer_maxiter: 500
+  one_standard_error_rule: true
+
+outputs:
+  fusion_predictions_csv: results_v2/fusion_predictions_v2.csv
+  fusion_metrics_csv: results_v2/fusion_metrics_v2.csv
+  gate_selection_csv: results_v2/gate_selection_v2.csv
+  feature_audit_csv: results_v2/fusion_feature_audit_v2.csv
+  metadata_json: results_v2/phase5_fusion_metadata.json

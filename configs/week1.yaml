@@ -1,0 +1,33 @@
+dataset:
+  name: BACE
+  raw_csv: data/raw/bace.csv
+  smiles_column: mol
+  classification_target: Class
+  regression_target: pIC50
+
+task:
+  primary: binary_classification
+  positive_label: 1
+
+split:
+  method: bemis_murcko_scaffold
+  allocation: label_balanced_group_assignment
+  fractions:
+    train: 0.70
+    valid: 0.15
+    test: 0.15
+  include_chirality: false
+  maximum_ratio_error: 0.01
+  require_zero_scaffold_overlap: true
+
+evaluation:
+  primary_metrics:
+    - roc_auc
+    - pr_auc
+  secondary_metrics:
+    - balanced_accuracy
+    - f1
+    - mcc
+    - brier_score
+  threshold_selection: validation_set_only
+  test_policy: locked_until_final_evaluation

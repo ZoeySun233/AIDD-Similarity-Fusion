@@ -1,0 +1,61 @@
+stage: external_wp3_new_frozen_deployment
+training_input: data/processed_v2/bace_standardized.csv
+historical_oof_input: results_v2/base_model_predictions.csv
+outer_manifest: data/splits_v2/outer_repeat_1.csv
+cohort_lock: data/external_v2/chembl_37_wp2/cohort_lock.json
+cohort_input: data/external_v2/chembl_37_wp2/eligible_cohort.csv
+primary_assay: CHEMBL5736880
+secondary_assay: CHEMBL5734173
+seeds: [11, 22, 33]
+rf:
+  radius: 2
+  bits: 2048
+  include_chirality: true
+  n_estimators: 200
+  class_weight: balanced_subsample
+  max_depth: 24
+  min_samples_leaf: 1
+  max_features: sqrt
+chemberta:
+  checkpoint: DeepChem/ChemBERTa-77M-MLM
+  revision: ed8a5374f2024ec8da53760af91a33fb8f6a15ff
+  pooling: attention_masked_mean
+  max_length: 256
+  batch_size: 32
+  hidden_dim: 64
+  dropout: 0.1
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  epochs: 80
+calibration:
+  method: platt_on_clipped_logit
+  probability_clip: 0.000001
+  C: 1000000.0
+  solver: lbfgs
+  max_iter: 1000
+fusion:
+  target: brier
+  beta_l2: 0.01
+  lambda_l2: 0.02
+  optimizer_maxiter: 500
+  features: [max_similarity, entropy_difference]
+evaluation:
+  primary_metric: average_precision
+  key_probability_metric: brier_score
+  log_loss_clip: 0.000001
+  top_fractions: [0.05, 0.10]
+  threshold: 0.5
+  threshold_role: descriptive_only
+  ranking_tie_break: ascending_assay_then_inchikey
+  similarity_edges: [0.0, 0.4, 0.6, 0.8, 1.000001]
+  bootstrap_replicates: 10000
+  bootstrap_max_attempts: 100000
+  bootstrap_min_valid: 9500
+  bootstrap_seed: 20261020
+  insufficient_cluster_threshold: 20
+  wide_ci_threshold: 0.10
+  min_scaffold_retained_gain_fraction: 0.5
+  success_delta_ap: 0.01
+  success_max_delta_brier: 0.003
+bundle_directory: models_v2/external_frozen_bundle
+output_directory: results_v2/external_wp3

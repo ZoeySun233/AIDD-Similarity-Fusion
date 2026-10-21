@@ -1,0 +1,28 @@
+name: aidd-similarity-fusion
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - ipykernel
+  - jupyterlab
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - pymupdf
+  - seaborn
+  - rdkit
+  - shap
+  - joblib
+  - tqdm
+  - pyyaml
+  - pytest
+  - pytorch::pytorch=2.5.1
+  - pip:
+      - transformers==4.46.3
+      - tokenizers==0.20.3
+      - accelerate
+      - safetensors
+      - requests

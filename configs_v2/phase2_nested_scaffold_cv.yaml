@@ -1,0 +1,45 @@
+dataset:
+  standardized_csv: data/processed_v2/bace_standardized.csv
+  source_row_column: source_row
+  label_column: Class
+  scaffold_column: scaffold
+  structure_group_column: v2_structure_group_id
+
+outer_cv:
+  repeats: 2
+  folds: 5
+  seeds: [101, 202]
+
+inner_cv:
+  folds: 3
+
+training_seeds: [11, 22, 33]
+
+splitter:
+  method: balanced_bemis_murcko_scaffold_cv
+  enforce_structure_group_integrity: true
+  require_zero_scaffold_overlap: true
+  require_zero_structure_group_overlap: true
+
+sensitivity_analyses:
+  canonical_deepchem_scaffold_cv:
+    enabled: true
+    folds: 5
+    seed: 303
+    note: "Uses the canonical non-chiral Murcko scaffold definition used by DeepChem; the CV allocator is group-balanced."
+  butina_cluster_cv:
+    enabled: true
+    folds: 5
+    seed: 404
+    morgan_radius: 2
+    fingerprint_size: 2048
+    distance_threshold: 0.40
+    note: "Secondary chemical-space shift analysis; cluster folds are not required to be scaffold-disjoint."
+  random_split:
+    enabled: false
+    note: "Not generated for model selection or primary reporting; it may only be added later as an explicitly optimistic upper bound."
+
+outputs:
+  split_directory: data/splits_v2
+  split_audit_csv: results_v2/split_audit.csv
+  metadata_json: results_v2/phase2_split_metadata.json
