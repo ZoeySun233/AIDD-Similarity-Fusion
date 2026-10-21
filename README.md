@@ -37,8 +37,6 @@ The original, unfiltered research repository was snapshotted at Git commit `a88d
 The source datasets and ChemBERTa weights are downloaded from their original providers; they are not bundled here. Reproducing the complete external evaluation also requires rebuilding the ChEMBL snapshot and the frozen deployment bundle. The supplied summary tables are published results, **not** a substitute for those omitted artifacts.
 
 ## Research boundaries
-
-- The first Week 1–5 test was already viewed and is treated as historical, not a fresh test for version-2 method selection.
 - The two scaffold-CV repeats reuse the same 1,513 original molecules; ten fold-repeat comparisons are not ten independent datasets.
 - The external primary cohort comes from one patent/assay source. It is a focused transfer test, not a general deployment benchmark.
 - Original DeepChem labels include some non-IC50 endpoints; the external IC50 threshold is justified for the original IC50-labelled subset, not every training row.
